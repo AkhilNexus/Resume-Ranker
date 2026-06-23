@@ -41,8 +41,10 @@ def rewrite_resume(resume_text: str, job_description: str = "") -> str:
 
     if job_description.strip():
         user_prompt = f"""
-Here is the original resume and a job description.
-Please rewrite the resume to be highly relevant to this specific job.
+        IMPORTANT:
+        Return ONLY the rewritten resume.
+        Do NOT include introductions, explanations,
+        or phrases like "Here is the rewritten resume".
 
 --- Job Description ---
 {job_description.strip()}
@@ -82,7 +84,7 @@ Here is an original resume. Please rewrite it to be more professional and job-re
                 input={
                     "system_prompt": system_prompt,
                     "prompt": user_prompt,
-                    "max_new_tokens": 256,
+                    "max_new_tokens": 1024,
                     "temperature": 0.6,
                     "top_p": 0.9,
                 },
