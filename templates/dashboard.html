@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HR Dashboard - SkillSculptor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-sky-100 to-indigo-200 min-h-screen p-6 font-sans">
+  <div class="max-w-3xl mx-auto">
+    <h1 class="text-4xl font-extrabold text-indigo-800 text-center mb-2">👩‍💼 HR Dashboard</h1>
+    <p class="text-lg text-gray-600 text-center mb-8">View and manage ranked resumes</p>
+
+    {% if ranked %}
+      <h2 class="text-2xl font-semibold text-indigo-800 border-b pb-2">🏆 Ranked Candidates</h2>
+      <ol class="mt-4 space-y-4">
+        {% for candidate in ranked %}
+          <li class="bg-white p-6 rounded-xl shadow-md border-t-4 border-indigo-500 hover:shadow-lg transition-all">
+            <h3 class="font-bold text-lg text-indigo-700">{{ candidate.file }}</h3>
+
+            <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden mt-2">
+              <div class="bg-indigo-500 h-full text-right text-xs text-white pr-2 leading-4 font-bold transition-all"
+                   style="width: {{ candidate.score.replace('%','') }}%">
+                {{ candidate.score }}
+              </div>
+            </div>
+
+            <p class="mt-2 text-sm"><strong>Summary:</strong> {{ candidate.summary }}</p>
+            <p class="mt-1 text-sm"><strong>Feedback:</strong> {{ candidate.feedback }}</p>
+            <p class="mt-1 text-sm"><strong>Skill Gap:</strong> {{ candidate.skill_gap }}</p>
+
+            <p class="text-sm mt-2"><strong>Keywords:</strong>
+              {% for word in candidate.keywords %}
+                <span class="inline-block bg-indigo-100 text-indigo-800 text-xs px-3 py-1 rounded-full font-medium mr-1 mb-1">
+                  {{ word }}
+                </span>
+              {% endfor %}
+            </p>
+
+            <div class="mt-4 flex gap-3">
+              <form action="{{ url_for('preview_rewrite') }}" method="post">
+                <input type="hidden" name="filename" value="{{ candidate.file }}">
+                <input type="hidden" name="original_text" value="{{ candidate.original_text }}">
+                <input type="hidden" name="job_desc" value="{{ candidate.job_desc }}">
+                <button type="submit" class="px-6 py-3 rounded-full font-bold text-white bg-blue-600 hover:bg-blue-700 transform hover:scale-105 transition-transform">
+                  ✍ Rewrite Resume
+                </button>
+              </form>
+            </div>
+          </li>
+        {% endfor %}
+      </ol>
+    {% else %}
+      <p class="p-4 bg-red-100 text-red-700 rounded-lg text-center mb-6">
+        No resumes have been analyzed yet. Please go back to the home page to upload resumes.
+      </p>
+    {% endif %}
+
+    <div class="mt-6 text-center">
+      <a href="/" class="inline-block px-6 py-3 rounded-full font-bold text-white bg-indigo-600 hover:bg-indigo-700 transform hover:scale-105 transition-transform">
+        🏠 Back to Home
+      </a>
+    </div>
+  </div>
+</body>
+</html>

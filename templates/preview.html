@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Resume Preview - SkillSculptor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-sky-100 to-indigo-200 min-h-screen p-6 font-sans">
+  <div class="max-w-5xl mx-auto">
+    <h1 class="text-3xl font-bold text-indigo-800 text-center mb-2">👀 Resume Preview</h1>
+    <p class="text-lg text-gray-600 text-center mb-8">Review the rewritten resume and download your preferred format.</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- Original Resume -->
+      <div class="bg-white p-6 rounded-xl shadow-lg">
+        <h2 class="text-xl font-semibold mb-4 text-gray-700">Original Resume</h2>
+        <pre class="whitespace-pre-wrap font-mono text-sm leading-6 text-gray-800">
+{{ original_text }}
+        </pre>
+      </div>
+
+      <!-- Rewritten Resume -->
+      <div class="bg-white p-6 rounded-xl shadow-lg">
+        <h2 class="text-xl font-semibold mb-4 text-indigo-700">Rewritten Resume</h2>
+        <pre class="whitespace-pre-wrap font-mono text-sm leading-6 text-gray-800">
+{{ rewritten_text }}
+        </pre>
+      </div>
+    </div>
+
+    <!-- Download Buttons -->
+    <div class="flex flex-col sm:flex-row justify-center gap-4 mt-8">
+      <a href="{{ url_for('download_txt', filename=filename) }}"
+         class="px-6 py-3 rounded-full font-bold text-white bg-green-600 hover:bg-green-700 text-center transform hover:scale-105 transition-transform">
+        ⬇ Download as Text (.txt)
+      </a>
+      <a href="{{ url_for('download_pdf', filename=filename) }}"
+         class="px-6 py-3 rounded-full font-bold text-white bg-purple-600 hover:bg-purple-700 text-center transform hover:scale-105 transition-transform">
+        ⬇ Download as PDF (.pdf)
+      </a>
+      <a href="/" 
+         class="px-6 py-3 rounded-full font-bold text-gray-800 bg-gray-200 hover:bg-gray-300 text-center transform hover:scale-105 transition-transform">
+        ⬅ Back to Home
+      </a>
+    </div>
+  </div>
+</body>
+</html>

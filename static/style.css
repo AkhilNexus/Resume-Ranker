@@ -1,0 +1,137 @@
+/* === General Layout === */
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to bottom right, #e0f2fe, #dbeafe); /* sky-100 to indigo-100 */
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 960px;
+  margin: 40px auto;
+  background: #fff;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* === Titles & Text === */
+.title {
+  font-size: 2.5rem;
+  text-align: center;
+  color: #4f46e5; /* indigo-600 */
+  margin-bottom: 20px;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  text-align: center;
+  color: #6b7280; /* gray-500 */
+  margin-bottom: 30px;
+}
+
+/* === Form Styling === */
+form input,
+form textarea,
+form button {
+  width: 100%;
+  font-size: 1rem;
+  padding: 12px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1; /* gray-300 */
+  box-sizing: border-box;
+}
+
+form textarea {
+  height: 120px;
+  resize: vertical;
+}
+
+form button {
+  background-color: #6366f1; /* indigo-500 */
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  transition: background 0.3s ease;
+}
+
+form button:hover {
+  background-color: #4f46e5; /* indigo-600 */
+}
+
+/* === Result Cards === */
+.resume-list {
+  list-style-type: decimal;
+  padding-left: 20px;
+}
+
+.result-card {
+  background: #f9fafb; /* gray-50 */
+  border-left: 6px solid #6366f1; /* indigo-500 */
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+/* === Tags & Keywords === */
+.tag {
+  display: inline-block;
+  background-color: #e0e7ff; /* indigo-100 */
+  color: #4338ca; /* indigo-800 */
+  font-size: 0.8rem;
+  padding: 6px 10px;
+  border-radius: 9999px;
+  margin: 4px 4px 0 0;
+}
+
+/* === Match Bar === */
+.progress-bar {
+  background-color: #e5e7eb; /* gray-200 */
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 10px 0;
+  height: 20px;
+}
+
+.progress {
+  height: 100%;
+  background: linear-gradient(to right, #f472b6, #8b5cf6); /* pink-400 to violet-600 */
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: bold;
+  text-align: center;
+  line-height: 20px;
+  transition: width 0.4s ease-in-out;
+}
+
+/* === Error Message === */
+.error {
+  color: #dc2626; /* red-600 */
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* === Chart Section === */
+canvas {
+  margin-top: 30px;
+}
+
+/* === Buttons === */
+.btn {
+  display: inline-block;
+  padding: 10px 16px;
+  background-color: #4f46e5; /* indigo-600 */
+  color: #fff;
+  border-radius: 8px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #3730a3; /* indigo-800 */
+}

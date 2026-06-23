@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillSculptor – Resume Ranker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-sky-100 to-indigo-200 min-h-screen p-6 font-sans">
+  <div class="max-w-3xl mx-auto">
+    <h1 class="text-4xl font-extrabold text-indigo-800 text-center mb-2">📄 SkillSculptor</h1>
+    <p class="text-lg text-gray-600 text-center mb-8">Match and improve resumes with job descriptions.</p>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="p-4 bg-red-100 text-red-700 rounded-lg text-center mb-6">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Upload form -->
+    <form action="/rank" method="post" enctype="multipart/form-data" class="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all">
+      <h2 class="text-xl font-semibold mb-4 text-indigo-700">Job Description & Resumes</h2>
+
+      <label for="jobdesc" class="block text-gray-700 font-semibold mb-2">Job Description (paste text)</label>
+      <textarea id="jobdesc" name="jobdesc" rows="6" placeholder="Paste the full job description here..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none"></textarea>
+
+      <label for="joburl" class="block text-gray-700 font-semibold mb-2 mt-4">OR Job URL (e.g., LinkedIn, Naukri)</label>
+      <input type="url" id="joburl" name="joburl" placeholder="Paste job URL here..." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none">
+
+      <label for="resumes" class="block text-gray-700 font-semibold mb-2 mt-4">Upload Resumes (PDF or DOCX)</label>
+      <input type="file" id="resumes" name="resumes" accept=".pdf,.docx" multiple class="w-full text-gray-700 mt-2">
+
+      <button type="submit" class="w-full mt-6 px-6 py-3 rounded-full font-bold text-white bg-indigo-600 hover:bg-indigo-700 transform hover:scale-105 transition-transform">
+        🚀 Rank Resumes
+      </button>
+    </form>
+
+    <!-- Ranked candidates -->
+    {% if ranked %}
+      <div class="mt-8">
+        <h2 class="text-2xl font-semibold text-indigo-800 border-b pb-2">🏆 Ranked Candidates</h2>
+        <ol class="mt-4 space-y-4">
+          {% for candidate in ranked %}
+            <li class="bg-white p-6 rounded-xl shadow-md border-t-4 border-indigo-500 hover:shadow-lg transition-all">
+              <h3 class="font-bold text-lg text-indigo-700">{{ candidate.file }}</h3>
+
+              <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden mt-2">
+                <div class="bg-indigo-500 h-full text-right text-xs text-white pr-2 leading-4 font-bold transition-all"
+                     style="width: {{ candidate.score.replace('%','') }}%">
+                  {{ candidate.score }}
+                </div>
+              </div>
+
+              <p class="mt-2 text-sm"><strong>Summary:</strong> {{ candidate.summary }}</p>
+              <p class="mt-1 text-sm"><strong>Feedback:</strong> {{ candidate.feedback }}</p>
+              <p class="mt-1 text-sm"><strong>Skill Gap:</strong> {{ candidate.skill_gap }}</p>
+
+              <p class="text-sm mt-2"><strong>Keywords:</strong>
+                {% for word in candidate.keywords %}
+                  <span class="inline-block bg-indigo-100 text-indigo-800 text-xs px-3 py-1 rounded-full font-medium mr-1 mb-1">
+                    {{ word }}
+                  </span>
+                {% endfor %}
+              </p>
+
+              <div class="mt-4 flex gap-3">
+                <form action="{{ url_for('preview_rewrite') }}" method="post">
+                  <input type="hidden" name="filename" value="{{ candidate.file }}">
+                  <input type="hidden" name="original_text" value="{{ candidate.original_text }}">
+                  <input type="hidden" name="job_desc" value="{{ candidate.job_desc }}">
+                  <button type="submit" class="px-6 py-3 rounded-full font-bold text-white bg-blue-600 hover:bg-blue-700 transform hover:scale-105 transition-transform">
+                    ✍ Rewrite Resume
+                  </button>
+                </form>
+              </div>
+            </li>
+          {% endfor %}
+        </ol>
+      </div>
+
+      <div class="mt-8">
+        <h2 class="text-2xl font-semibold text-indigo-800 border-b pb-2">💡 Job Suggestions</h2>
+        <ul class="list-disc list-inside mt-4 text-gray-700 space-y-1">
+          {% for url in suggestions %}
+            <li><a href="{{ url }}" class="text-indigo-600 hover:underline" target="_blank">{{ url }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <div class="mt-6 text-center">
+      <a href="/dashboard" class="inline-block px-6 py-3 rounded-full font-bold text-white bg-indigo-600 hover:bg-indigo-700 transform hover:scale-105 transition-transform">
+        📊 View Dashboard
+      </a>
+    </div>
+  </div>
+</body>
+</html>
