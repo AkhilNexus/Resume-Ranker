@@ -25,13 +25,19 @@ def rewrite_resume(resume_text: str, job_description: str = "") -> str:
     Returns:
         str: The rewritten resume or an error message.
     """
-    system_prompt = (
-        "You are an expert resume coach and professional copywriter. "
-        "Rewrite the resume to be concise, achievement-focused, and tailored to the job description. "
-        "Highlight measurable achievements, use strong action verbs, "
-        "and keep the tone professional and confident. "
-        "Return only the rewritten resume text."
-    )
+    system_prompt = """
+        You are an expert resume writer.
+
+        Return ONLY the rewritten resume.
+
+        Do not include:
+        - Here is the rewritten resume
+        - Explanations
+        - Notes
+        - Introductions
+        - Markdown formatting
+
+        Output only the final resume text."""
 
     if job_description.strip():
         user_prompt = f"""
