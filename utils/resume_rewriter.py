@@ -72,11 +72,11 @@ Here is an original resume. Please rewrite it to be more professional and job-re
     for attempt in range(max_retries):
         try:
             output = client.run(
-                "meta/llama-2-13b-chat",
+                "meta/meta-llama-3-8b-instruct",
                 input={
                     "system_prompt": system_prompt,
                     "prompt": user_prompt,
-                    "max_new_tokens": 512,
+                    "max_new_tokens": 256,
                     "temperature": 0.6,
                     "top_p": 0.9,
                 },
@@ -101,6 +101,8 @@ Here is an original resume. Please rewrite it to be more professional and job-re
             )
         except Exception as e:
             print(f"❌ Unexpected error: {e}")
-            return "An unexpected error occurred while rewriting the resume."
+            import traceback
+            traceback.print_exc()
+            return f"Error: {str(e)}"
 
     return "Failed to rewrite resume after multiple attempts."

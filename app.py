@@ -226,24 +226,23 @@ def download_txt(filename):
 
 
 # ---------- PDF helpers (FPDF + ReportLab fallback) ----------
-def create_pdf_with_fpdf(text: str, pdf_path: str, font_path: Optional[str] = None) -> None:
-    from fpdf import FPDF
+from fpdf import FPDF
 
+def create_pdf_with_fpdf(text, pdf_path, font_path):
     pdf = FPDF()
-    pdf.set_auto_page_break(True, margin=12)
     pdf.add_page()
 
-    try:
-        if font_path and os.path.exists(font_path):
-            pdf.add_font("DejaVu", "", font_path, uni=True)
-            pdf.set_font("DejaVu", size=11)
-        else:
-            pdf.set_font("Arial", size=11)
-    except Exception:
-        pdf.set_font("Arial", size=11)
+    pdf.add_font(
+        "DejaVu",
+        "",
+        font_path,
+        uni=True
+    )
 
-    for paragraph in str(text).splitlines():
-        pdf.multi_cell(0, 6, paragraph)
+    pdf.set_font("DejaVu", size=11)
+
+    for line in text.split("\n"):
+        pdf.multi_cell(0, 8, line)
 
     pdf.output(pdf_path)
 
