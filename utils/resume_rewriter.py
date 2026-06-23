@@ -5,112 +5,152 @@ from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
+
 REPLICATE_API_TOKEN = os.getenv("REPLICATE_API_TOKEN")
 
 if not REPLICATE_API_TOKEN:
-    raise ValueError("❌ Missing REPLICATE_API_TOKEN in .env file. Please add it before running.")
+    raise ValueError(
+        "❌ Missing REPLICATE_API_TOKEN in environment variables."
+    )
 
-# Initialise Replicate client
+# Replicate Client
 client = replicate.Client(api_token=REPLICATE_API_TOKEN)
 
 
 def rewrite_resume(resume_text: str, job_description: str = "") -> str:
     """
-    Rewrite a resume using the LLaMA-2 13B Chat model from Replicate.
-
-    Args:
-        resume_text (str): The raw resume text.
-        job_description (str): Optional job description text for tailoring.
-
-    Returns:
-        str: The rewritten resume or an error message.
+    Rewrite and optimize resume for ATS compatibility.
     """
-    system_prompt = """
-        You are an expert resume writer.
-
-        Return ONLY the rewritten resume.
-
-        Do not include:
-        - Here is the rewritten resume
-        - Explanations
-        - Notes
-        - Introductions
-        - Markdown formatting
-
-        Output only the final resume text."""
 
     if job_description.strip():
-        user_prompt = f"""
-        IMPORTANT:
-        Return ONLY the rewritten resume.
-        Do NOT include introductions, explanations,
-        or phrases like "Here is the rewritten resume".
 
---- Job Description ---
+        user_prompt = f"""
+You are a senior resume writer and ATS optimization expert.
+
+TASK:
+Rewrite the resume to strongly match the job description.
+
+STRICT RULES:
+- Return ONLY the rewritten resume.
+- Do NOT write phrases such as:
+  "Here is the rewritten resume"
+  "Rewritten Resume"
+  "Updated Resume"
+  "Certainly"
+  "Sure"
+  or any explanation.
+- Do NOT use markdown.
+- Preserve the candidate's actual experience.
+- Improve wording significantly.
+- Convert responsibilities into achievements.
+- Add measurable impact wherever possible.
+- Use ATS-friendly keywords from the job description.
+- Keep professional formatting.
+
+JOB DESCRIPTION:
 {job_description.strip()}
 
---- Original Resume ---
+ORIGINAL RESUME:
 {resume_text.strip()}
 
---- Instructions for Rewrite ---
-1. Extract skills, responsibilities, and keywords from the job description.
-2. Align the resume with these requirements.
-3. Transform responsibilities into measurable accomplishments.
-4. Correct grammar, spelling, and punctuation.
-5. Keep the tone professional and achievement-oriented.
-6. Use bullet points where appropriate.
+OUTPUT:
+Only the final rewritten resume.
 """
+
     else:
-        user_prompt = f"""
-Here is an original resume. Please rewrite it to be more professional and job-ready.
 
---- Original Resume ---
+        user_prompt = f"""
+You are a professional resume writer.
+
+TASK:
+Rewrite the resume to make it ATS-friendly and highly professional.
+
+STRICT RULES:
+- Return ONLY the rewritten resume.
+- Do NOT write:
+  "Here is the rewritten resume"
+  "Updated Resume"
+  explanations
+  notes
+  introductions
+  conclusions
+- Do NOT use markdown.
+- Improve grammar.
+- Improve formatting.
+- Rewrite weak bullet points.
+- Convert duties into accomplishments.
+- Use powerful action verbs.
+- Make the resume look professionally written.
+- Preserve factual information.
+
+ORIGINAL RESUME:
 {resume_text.strip()}
 
---- Instructions for Rewrite ---
-1. Correct grammar, spelling, and punctuation.
-2. Start bullet points with strong action verbs.
-3. Transform responsibilities into measurable accomplishments.
-4. Ensure a confident, professional tone.
-5. Maintain a clear and simple formatting style.
+OUTPUT:
+Only the rewritten resume.
 """
 
-    # Retry logic
     max_retries = 3
+
     for attempt in range(max_retries):
         try:
+
             output = client.run(
                 "meta/meta-llama-3-8b-instruct",
                 input={
-                    "system_prompt": system_prompt,
                     "prompt": user_prompt,
-                    "max_new_tokens": 1024,
-                    "temperature": 0.6,
+                    "temperature": 0.4,
                     "top_p": 0.9,
+                    "max_new_tokens": 1200,
                 },
             )
 
-            # Replicate may return a generator, list, or string
             if isinstance(output, list):
-                return "".join(output)
+                result = "".join(output)
+
             elif hasattr(output, "__iter__") and not isinstance(output, str):
-                return "".join(list(output))
-            return str(output)
+                result = "".join(list(output))
+
+            else:
+                result = str(output)
+
+            # Remove common unwanted prefixes
+            unwanted_prefixes = [
+                "Here is the rewritten resume:",
+                "Rewritten Resume:",
+                "Updated Resume:",
+                "Certainly!",
+                "Sure!",
+            ]
+
+            for prefix in unwanted_prefixes:
+                if result.startswith(prefix):
+                    result = result.replace(prefix, "", 1).strip()
+
+            return result
 
         except replicate.exceptions.ReplicateError as e:
-            if "insufficient credit" in str(e).lower() and attempt < max_retries - 1:
+
+            if (
+                "insufficient credit" in str(e).lower()
+                and attempt < max_retries - 1
+            ):
                 wait_time = 2 ** (attempt + 1)
-                print(f"⚠️ ReplicateError: Insufficient credit. Retrying in {wait_time}s...")
+
+                print(
+                    f"⚠️ ReplicateError. Retrying in {wait_time}s..."
+                )
+
                 time.sleep(wait_time)
                 continue
+
             return (
-                "An error occurred with Replicate API. "
-                "Please check your account balance and API token."
+                "Replicate API error. "
+                "Please verify API token and account credits."
             )
+
         except Exception as e:
             print(f"❌ Unexpected error: {e}")
-            import traceback
-            traceback.print_exc()
-            return f"Error: {str(e)}"
+            return f"Unexpected error: {str(e)}"
 
     return "Failed to rewrite resume after multiple attempts."
